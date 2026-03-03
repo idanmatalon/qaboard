@@ -211,6 +211,20 @@ class ImgViewer extends React.PureComponent {
     setupVisibilityTracking(viewer_new);
     setupVisibilityTracking(viewer_ref);
 
+    // If joining a group that was already zoomed/panned (e.g. viewer mounted late),
+    // catch up immediately rather than waiting for the next user interaction or IntersectionObserver.
+    const { zoom, center } = synced_viewers[sync_key];
+    if (zoom !== null && center !== null) {
+      synced_viewers[sync_key].leading = 'catchup';
+      try {
+        viewer_new.viewport.zoomTo(zoom, null, true);
+        viewer_new.viewport.panTo(center, true);
+        viewer_ref.viewport.zoomTo(zoom, null, true);
+        viewer_ref.viewport.panTo(center, true);
+      } catch {}
+      synced_viewers[sync_key].leading = null;
+    }
+
     var lead_viewer_sync = (sync_key, viewer) => () => {
       // console.log("[lead_viewer_sync]")
       let { leading } = synced_viewers[sync_key];
