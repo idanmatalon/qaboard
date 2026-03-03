@@ -268,6 +268,11 @@ class ImgViewer extends React.PureComponent {
           delete synced_viewers[sync_key].observers?.[v.id];
           delete synced_viewers[sync_key].visibility?.[v.id];
         })
+        // Reset zoom/center when the last viewer leaves so returning to the page starts fresh
+        if (synced_viewers[sync_key].viewers.length === 0) {
+          synced_viewers[sync_key].zoom = null;
+          synced_viewers[sync_key].center = null;
+        }
       }
       this.UnregisterZoomSync = null;
     }
