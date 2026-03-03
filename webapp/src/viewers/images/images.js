@@ -160,6 +160,18 @@ class ImgViewer extends React.PureComponent {
     const sync_key = `${this.props.output_new.test_input_path}-${image_height}x${image_width}`;
     // console.log("sync_key", sync_key)
 
+    // Remove stale viewers whose containers are no longer in the DOM (e.g. after page navigation).
+    // If none remain, reset zoom/center so the page always starts fresh.
+    if (synced_viewers[sync_key] !== undefined) {
+      synced_viewers[sync_key].viewers = synced_viewers[sync_key].viewers.filter(
+        v => v.container && document.body.contains(v.container)
+      );
+      if (synced_viewers[sync_key].viewers.length === 0) {
+        synced_viewers[sync_key].zoom = null;
+        synced_viewers[sync_key].center = null;
+      }
+    }
+
     if (synced_viewers[sync_key] === undefined) {
       // console.log("init synced viewers", sync_key)
       synced_viewers[sync_key] = {
